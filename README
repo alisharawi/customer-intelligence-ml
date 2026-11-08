@@ -1,0 +1,110 @@
+📊 Customer Intelligence & Purchase Prediction System
+
+📝 Project Overview
+
+This project is an end-to-end Machine Learning solution designed to analyze customer purchasing behavior, segment high-value customers, and predict future transactions. Built using the UCI "Online Retail II" dataset (wholesale novelty distribution), the system identifies which customers are most likely to make a purchase in the next 30 days, empowering marketing teams to optimize their retention campaigns.
+
+The project encompasses a complete data science lifecycle, from raw data preprocessing and feature engineering to model deployment via a RESTful API and an interactive Streamlit web dashboard.
+
+🚀 Key Features
+
+Data Pipeline & Feature Engineering: Cleans an 800k+ row dataset, handles missing values, and engineers robust RFM (Recency, Frequency, Monetary) behavioral features.
+
+Machine Learning (Purchase Prediction): Evaluates 5 classification models (Dummy, Logistic Regression, Decision Tree, Random Forest, Gradient Boosting) using advanced metrics (PR-AUC, Precision@100). The winning Logistic Regression model balances recall and precision to catch actual returning buyers.
+
+Unsupervised Customer Segmentation: Uses log-transformation and K-Means Clustering to mathematically group customers into 4 distinct segments, successfully identifying the "Champion" VIP buyers.
+
+Production REST API: A fully functional FastAPI web server with Pydantic data validation, delivering live predictions via a /predict endpoint.
+
+Interactive Dashboard: A sleek Streamlit web application featuring Business Analytics KPIs, dynamic clustering visuals, and a 30-day prediction simulator for non-technical stakeholders.
+
+Automated Testing: Implementation of pytest to ensure API reliability and exact JSON schema matching.
+
+📂 Repository Structure
+
+customer-intelligence-ml/
+│
+├── api/                    # Production FastAPI application
+│   ├── main.py             # API endpoints (/health, /predict)
+│   └── test_main.py        # Automated Pytest scripts
+│
+├── dashboard/              # Interactive Streamlit frontend
+│   └── app.py              # Dashboard UI and data visualizations
+│
+├── Data/                   # Raw and processed datasets
+│   └── raw_data.xlsx       # (Not included in repo due to size)
+│
+├── notebooks/              # Initial Jupyter notebooks for EDA 
+│
+├── src/                    # Core Machine Learning pipeline scripts
+│   ├── data_preprocessing.py
+│   ├── feature_engineering.py
+│   ├── train.py            # Script to train and compare algorithms
+│   ├── evaluate.py         # Script to evaluate model metrics
+│   ├── clustering.py       # K-Means segmentation logic
+│   └── save_model.py       # Script to export the final .pkl model
+│
+├── production_model.pkl    # Serialized Logistic Regression model
+└── README.md
+
+
+🛠️ Tech Stack
+
+Language: Python 3
+
+Data Manipulation: Pandas, NumPy
+
+Machine Learning: Scikit-learn (Logistic Regression, K-Means, RandomForest)
+
+API & Deployment: FastAPI, Uvicorn, Pydantic
+
+Frontend Dashboard: Streamlit, Matplotlib, Seaborn
+
+Testing: Pytest, Httpx
+
+⚙️ How to Run the Project
+
+1. Setup Environment
+
+Ensure you have Python installed, then create and activate a virtual environment:
+
+python -m venv .venv
+# On Windows:
+.venv\Scripts\activate
+# On Mac/Linux:
+source .venv/bin/activate
+
+
+Install required dependencies:
+
+pip install pandas numpy scikit-learn matplotlib seaborn fastapi uvicorn pydantic joblib pytest httpx streamlit
+
+
+2. Run the REST API
+
+To launch the FastAPI server and access the Swagger UI documentation:
+
+uvicorn api.main:app --reload
+
+
+Visit http://127.0.0.1:8000/docs to test the endpoints interactively.
+
+3. Run the Interactive Dashboard
+
+To launch the Streamlit frontend application:
+
+streamlit run dashboard/app.py
+
+
+A new browser tab will open displaying the Customer Intelligence Hub.
+
+4. Run Automated Tests
+
+To verify the health and schema of the API using Pytest:
+
+pytest api/test_main.py -v
+
+
+🏆 Business Impact
+
+By deploying this system, businesses can confidently identify which customers are on the verge of returning and which "Champions" generate the most revenue. This allows for targeted, cost-effective marketing strategies, reducing promotional waste while maximizing customer lifetime value.
