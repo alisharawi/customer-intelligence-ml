@@ -39,8 +39,7 @@ customer-intelligence-ml/
 ├── src/                    # Core Machine Learning pipeline scripts
 │   ├── data_preprocessing.py
 │   ├── feature_engineering.py
-│   ├── train.py            # Script to train and compare algorithms
-│   ├── evaluate.py         # Script to evaluate model metrics
+│   ├── train.py            # Script to train, compare and evaluate model
 │   ├── clustering.py       # K-Means segmentation logic
 │   └── save_model.py       # Script to export the final .pkl model
 │
