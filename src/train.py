@@ -43,10 +43,8 @@ def train_and_compare_models():
         "4. Random Forest": RandomForestClassifier(n_estimators=100, class_weight='balanced', random_state=42),
         "5. Gradient Boosting": GradientBoostingClassifier(random_state=42)
     }
-    
     print("\nEvaluating models across all required metrics...\n")
     results = []
-    
     for name, model in models.items():
         model.fit(X_train, y_train)
         
