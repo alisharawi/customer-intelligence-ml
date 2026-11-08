@@ -35,6 +35,7 @@ customer-intelligence-ml/
 │   └── raw_data.xlsx       # (Not included in repo due to size)
 │
 ├── notebooks/              # Initial Jupyter notebooks for EDA 
+|   └── 01_data_understanding.ipynb
 │
 ├── src/                    # Core Machine Learning pipeline scripts
 │   ├── data_preprocessing.py
