@@ -45,6 +45,7 @@ customer-intelligence-ml/
 │   └── save_model.py       # Script to export the final .pkl model
 │
 ├── production_model.pkl    # Serialized Logistic Regression model
+├── customer intelligence ML notes and steps.md    # Notes and steps made through the project
 └── README.md
 
 
