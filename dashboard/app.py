@@ -138,18 +138,73 @@ elif page == "C. Purchase Prediction":
 # ==========================================
 elif page == "D. Model Evaluation":
     st.header("⚙️ Model Evaluation & Interpretation")
-    st.write("Evaluating the performance of our deployed Logistic Regression model.")
+    st.write("Dynamically evaluating the performance of our deployed Logistic Regression model.")
     
-    # Feature Importance (from Logistic Regression coefficients)
-    st.subheader("Feature Importance")
-    st.write("Which behaviors drive repeat purchases the most?")
+    # 1. Prepare Data & Run Live Evaluation
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, roc_auc_score
+    from sklearn.dummy import DummyClassifier
     
     features = ['Recency', 'Frequency', 'Monetary_Value', 'Total_Purchased_Quantity', 'Unique_Products_Purchased', 'Average_Order_Value']
+    X = customers[features]
+    y = customers['Target_Next_30_Days']
+    
+    # Split the data exactly as we did during the training phase
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    
+    # Get live predictions from the deployed model
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)[:, 1]
+    
+    # Create a baseline model (guessing the majority class) for comparison
+    dummy = DummyClassifier(strategy='prior')
+    dummy.fit(X_train, y_train)
+    dummy_pred = dummy.predict(X_test)
+    dummy_prob = dummy.predict_proba(X_test)[:, 1]
+    
+    # --- MODEL PERFORMANCE COMPARISON & METRICS ---
+    st.subheader("1. Model Performance Comparison")
+    st.write("Comparing our intelligent Machine Learning model against a baseline that just guesses 'No' for every customer.")
+    
+    metrics_df = pd.DataFrame({
+        "Metric": ["Precision", "Recall", "F1-Score", "ROC-AUC"],
+        "Deployed ML Model": [
+            precision_score(y_test, y_pred, zero_division=0),
+            recall_score(y_test, y_pred, zero_division=0),
+            f1_score(y_test, y_pred, zero_division=0),
+            roc_auc_score(y_test, y_prob)
+        ],
+        "Baseline (Guessing No)": [
+            precision_score(y_test, dummy_pred, zero_division=0),
+            recall_score(y_test, dummy_pred, zero_division=0),
+            f1_score(y_test, dummy_pred, zero_division=0),
+            roc_auc_score(y_test, dummy_prob)
+        ]
+    }).set_index("Metric")
+    
+    # Display the comparison table
+    st.dataframe(metrics_df.style.format("{:.3f}"))
+    
+    # --- CONFUSION MATRIX ---
+    st.subheader("2. Confusion Matrix")
+    st.write("Visualizing True Positives (successful predictions) vs. False Positives (errors).")
+    
+    cm = confusion_matrix(y_test, y_pred)
+    fig_cm, ax_cm = plt.subplots(figsize=(6, 4))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax_cm, 
+                xticklabels=['Predicted No', 'Predicted Yes'], 
+                yticklabels=['Actual No', 'Actual Yes'])
+    st.pyplot(fig_cm)
+    
+    # --- MODEL INTERPRETATION ---
+    st.subheader("3. Model Interpretation (Feature Importance)")
+    st.write("Which behaviors drive repeat purchases the most?")
+    
     importance = pd.DataFrame({
         'Feature': features,
         'Importance (Weight)': model.coef_[0]
     }).sort_values(by='Importance (Weight)', ascending=False)
     
-    fig, ax = plt.subplots(figsize=(8, 4))
-    sns.barplot(data=importance, x='Importance (Weight)', y='Feature', ax=ax, palette='coolwarm')
-    st.pyplot(fig)
+    fig_imp, ax_imp = plt.subplots(figsize=(8, 4))
+    sns.barplot(data=importance, x='Importance (Weight)', y='Feature', ax=ax_imp, palette='coolwarm')
+    st.pyplot(fig_imp)
