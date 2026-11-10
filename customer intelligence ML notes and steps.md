@@ -44,7 +44,7 @@ file name: src/data\_preprocessing \& src/feature\_engineering
 
 filename : src/train.py
 
-1- choose the features 
+1- chose the features 
 
 &#x09;\[ 'Recency', 'Frequency', 'Monetary\_Value', 
 
@@ -72,11 +72,11 @@ filename : src/train.py
 
 8- restructured all of the file to make 2 functions (train\_test\_split/precession\_at\_k)
 
-9- compared all models against each other and choose the best 
+9- compared all models against each other and chose the best 
 
 10- used precision score / confusion matrix / recall / f1 / roc auc / average precision to choose the best out of them all 
 
-11- choose logistic regression as the best among them all based on : 
+11- chose logistic regression as the best among them all based on : 
 
 &#x09;good precision / best recall / best f1 score / best roc-auc / best pr-auc / and second on precision@100
 
