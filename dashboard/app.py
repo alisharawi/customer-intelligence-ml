@@ -24,7 +24,9 @@ st.title("📊 Customer Intelligence & Purchase Prediction System")
 # @st.cache_data prevents the app from reloading the huge Excel file every time you click a button
 @st.cache_data
 def get_data():
-    df_clean = load_and_clean_data(r"C:\Users\Alish\OneDrive\Desktop\Mawdoo3 Internship\customer-intelligence-ml\Data\raw_data.xlsx")
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_path = os.path.join(base_dir, 'Data', 'raw_data.xlsx')
+    df_clean = load_and_clean_data(data_path)
     ml_data = build_customer_intelligence_dataset(df_clean)
     return df_clean, ml_data
 
