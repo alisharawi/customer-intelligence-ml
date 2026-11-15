@@ -96,6 +96,8 @@ To launch the Streamlit frontend application:
 
 streamlit run dashboard/app.py
 
+or you can visit https://customer-intelligence-ml-05.streamlit.app/ to explore the tool
+
 
 A new browser tab will open displaying the Customer Intelligence Hub.
 
