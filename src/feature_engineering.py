@@ -1,12 +1,11 @@
 import pandas as pd
 import datetime as dt
 
-def build_customer_intelligence_dataset(df, target_window_days=30):
+def build_customer_intelligence_dataset(df_clean, target_window_days=30):
     """
     Phase 2 Reusable Preprocessing Pipeline.
     Cleans data, engineers features, and prevents data leakage via temporal splitting.
     """
-    df_clean = df.copy()
     # 2. Temporal Split to prevent Data Leakage (Requirement 7)
     max_date = df_clean['InvoiceDate'].max()
     cutoff_date = max_date - pd.Timedelta(days=target_window_days)
