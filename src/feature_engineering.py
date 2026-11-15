@@ -6,12 +6,7 @@ def build_customer_intelligence_dataset(df, target_window_days=30):
     Phase 2 Reusable Preprocessing Pipeline.
     Cleans data, engineers features, and prevents data leakage via temporal splitting.
     """
-    # 1. Clean Data (Requirements 1, 2, 3)
-    df_clean = df.dropna(subset=['Customer ID']).copy()
-    df_clean = df_clean[~df_clean['Invoice'].astype(str).str.startswith('C')]
-    df_clean = df_clean.drop_duplicates()
-    df_clean['Total_Price'] = df_clean['Quantity'] * df_clean['Price']
-    
+    df_clean = df.copy()
     # 2. Temporal Split to prevent Data Leakage (Requirement 7)
     max_date = df_clean['InvoiceDate'].max()
     cutoff_date = max_date - pd.Timedelta(days=target_window_days)
