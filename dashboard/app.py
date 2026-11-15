@@ -14,14 +14,64 @@ from src.data_preprocessing import load_and_clean_data
 from src.feature_engineering import build_customer_intelligence_dataset
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.dummy import DummyClassifier
 
 # --- PAGE CONFIGURATION ---
-st.set_page_config(page_title="Customer Intelligence Hub", layout="wide")
+st.set_page_config(
+    page_title="Customer Intelligence Hub", 
+    layout="wide",
+    initial_sidebar_state="collapsed"  # Hides the sidebar on startup
+)
+
+# --- CUSTOM CSS & CHART STYLING (DARK BLUE THEME + HAMBURGER ICON) ---
+st.markdown(
+    """
+    <style>
+    /* Force dark navy blue background across main app and sidebar */
+    .stApp {
+        background-color: #0A192F;
+        color: #F8FAFC;
+    }
+    [data-testid="stSidebar"] {
+        background-color: #112240;
+    }
+    /* Style KPI metric cards */
+    [data-testid="stMetric"] {
+        background-color: #112240;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #1E293B;
+    }
+    /* Replace default '>' sidebar toggle with a 3-line '☰' hamburger button */
+    [data-testid="collapsedControl"] svg {
+        display: none;
+    }
+    [data-testid="collapsedControl"]::after {
+        content: "☰";
+        font-size: 26px;
+        color: #F8FAFC;
+        padding-left: 8px;
+        cursor: pointer;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# Match matplotlib/seaborn charts to the dark blue background
+plt.rcParams['figure.facecolor'] = '#0A192F'
+plt.rcParams['axes.facecolor'] = '#112240'
+plt.rcParams['axes.edgecolor'] = '#334155'
+plt.rcParams['text.color'] = '#F8FAFC'
+plt.rcParams['axes.labelcolor'] = '#F8FAFC'
+plt.rcParams['xtick.color'] = '#F8FAFC'
+plt.rcParams['ytick.color'] = '#F8FAFC'
+
 st.title("📊 Customer Intelligence & Purchase Prediction System")
 
 # --- CACHE DATA & MODELS ---
-# @st.cache_data prevents the app from reloading the huge Excel file every time you click a button
 @st.cache_data
 def get_data():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,7 +84,6 @@ def get_data():
 def get_model():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     model_path = os.path.join(base_dir, 'production_model.pkl')
-
     return joblib.load(model_path)
 
 with st.spinner("Loading database and models... (This takes a moment on startup)"):
@@ -42,7 +91,7 @@ with st.spinner("Loading database and models... (This takes a moment on startup)
     model = get_model()
 
 # --- SIDEBAR NAVIGATION ---
-st.sidebar.header("Navigation")
+st.sidebar.header("🧭 Navigation")
 page = st.sidebar.radio("Select a Dashboard Section:", 
     ["A. Business Analytics", "B. Customer Segmentation", "C. Purchase Prediction", "D. Model Evaluation"]
 )
@@ -63,7 +112,7 @@ if page == "A. Business Analytics":
     st.subheader("Monthly Sales Trend")
     monthly_sales = df.set_index('InvoiceDate').resample('ME')['Total_Price'].sum().reset_index()
     fig, ax = plt.subplots(figsize=(10, 4))
-    sns.lineplot(data=monthly_sales, x='InvoiceDate', y='Total_Price', marker="o", ax=ax)
+    sns.lineplot(data=monthly_sales, x='InvoiceDate', y='Total_Price', marker="o", color="#3B82F6", ax=ax)
     ax.set_ylabel("Revenue (£)")
     ax.set_xlabel("Date")
     st.pyplot(fig)
@@ -92,12 +141,12 @@ elif page == "B. Customer Segmentation":
         'Frequency': 'mean',
         'Monetary_Value': ['mean', 'count']
     }).round(1)
-    st.dataframe(summary)
+    st.dataframe(summary, use_container_width=True)
     
     # Display Chart
     st.subheader("Customer Value Comparison")
     fig, ax = plt.subplots(figsize=(8, 5))
-    sns.scatterplot(data=rfm, x='Recency', y='Monetary_Value', hue='Cluster', palette='viridis', alpha=0.6, ax=ax)
+    sns.scatterplot(data=rfm, x='Recency', y='Monetary_Value', hue='Cluster', palette='cool', alpha=0.7, ax=ax)
     ax.set_yscale('log')
     ax.set_title("Recency vs. Monetary Value by Segment")
     st.pyplot(fig)
@@ -127,10 +176,10 @@ elif page == "C. Purchase Prediction":
         
         st.divider()
         if prediction == 1:
-            st.success(f"### 🎉 Likely to Purchase!")
+            st.success("### 🎉 Likely to Purchase!")
             st.write(f"**Estimated Probability:** {probability * 100:.1f}%")
         else:
-            st.error(f"### ⚠️ Unlikely to Purchase")
+            st.error("### ⚠️ Unlikely to Purchase")
             st.write(f"**Estimated Probability:** {probability * 100:.1f}%")
 
 # ==========================================
@@ -139,11 +188,6 @@ elif page == "C. Purchase Prediction":
 elif page == "D. Model Evaluation":
     st.header("⚙️ Model Evaluation & Interpretation")
     st.write("Dynamically evaluating the performance of our deployed Logistic Regression model.")
-    
-    # 1. Prepare Data & Run Live Evaluation
-    from sklearn.model_selection import train_test_split
-    from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, roc_auc_score
-    from sklearn.dummy import DummyClassifier
     
     features = ['Recency', 'Frequency', 'Monetary_Value', 'Total_Purchased_Quantity', 'Unique_Products_Purchased', 'Average_Order_Value']
     X = customers[features]
@@ -183,7 +227,7 @@ elif page == "D. Model Evaluation":
     }).set_index("Metric")
     
     # Display the comparison table
-    st.dataframe(metrics_df.style.format("{:.3f}"))
+    st.dataframe(metrics_df.style.format("{:.3f}"), use_container_width=True)
     
     # --- CONFUSION MATRIX ---
     st.subheader("2. Confusion Matrix")
